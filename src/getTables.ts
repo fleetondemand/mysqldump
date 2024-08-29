@@ -1,5 +1,6 @@
 import { Table, ColumnList } from './interfaces/Table';
 import { DB } from './DB';
+import {AnonymisationOptions} from "./interfaces/Options";
 
 interface ShowTableRes {
     Table_type: 'BASE TABLE' | 'VIEW';
@@ -21,6 +22,7 @@ async function getTables(
     dbName: string,
     restrictedTables: Array<string>,
     restrictedTablesIsBlacklist: boolean,
+    anonymisationConfig: AnonymisationOptions
 ): Promise<Array<Table>> {
     // list the tables
     const showTablesKey = `Tables_in_${dbName}`;
@@ -33,6 +35,7 @@ async function getTables(
         data: null,
         isView: r.Table_type === 'VIEW',
         columns: {},
+        anonymisedColumns: {},
         columnsOrdered: [],
         triggers: [],
     }));
@@ -63,6 +66,15 @@ async function getTables(
 
     columns.forEach((cols, i) => {
         tables[i].columns = cols.reduce<ColumnList>((acc, c) => {
+            if (
+                anonymisationConfig.hasOwnProperty(tables[i].name)
+                && anonymisationConfig[tables[i].name].hasOwnProperty(c.Field)
+            ) {
+                tables[i].anonymisedColumns[c.Field] = {
+                    value: anonymisationConfig[tables[i].name][c.Field]
+                };
+            }
+
             acc[c.Field] = {
                 type: c.Type
                     // split to remove things like 'unsigned' from the string

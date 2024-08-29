@@ -253,6 +253,8 @@ interface Options {
      * Defaults to false.
      */
     compressFile?: boolean;
+
+    modifyDataOptions?: ModifyDataOptions;
 }
 
 // Recursively requires all properties on an object
@@ -273,6 +275,22 @@ interface CompletedOptions {
     dump: RequiredRecursive<DumpOptions>;
     dumpToFile: string | null;
     compressFile: boolean | null;
+    modifyDataOptions?: ModifyDataOptions;
+}
+
+interface ModifyDataOptions {
+    [table: string]: {
+        [column: string]: {
+            match?: Array<{
+                operators: Array<{
+                    column: string,
+                    pattern: string,
+                    behaviour?: boolean
+                }>
+            }>
+            value: string
+        }
+    }
 }
 
 export {
@@ -283,4 +301,5 @@ export {
     Options,
     SchemaDumpOptions,
     TriggerDumpOptions,
+    ModifyDataOptions
 };

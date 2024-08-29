@@ -133,6 +133,7 @@ export default async function main(inputOptions: Options): Promise<DumpReturn> {
                 options.connection.database,
                 options.dump.tables,
                 options.dump.excludeTables,
+                options.modifyDataOptions
             ),
         };
 

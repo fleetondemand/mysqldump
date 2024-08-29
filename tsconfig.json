@@ -5,7 +5,7 @@
         "alwaysStrict": true,
         "allowUnreachableCode": false,
         "allowUnusedLabels": false,
-        "lib": ["es2017", "esnext.asynciterable"],
+        "lib": ["es2020", "esnext.asynciterable"],
         "module": "commonjs",
         "noEmitOnError": true,
         "noImplicitAny": true,

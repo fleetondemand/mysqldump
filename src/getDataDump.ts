@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as mysql from 'mysql2';
 import * as sqlformatter from 'sql-formatter';
 import { all as merge } from 'deepmerge';
-
+import { generate as randomWord } from 'random-words';
 import { ConnectionOptions, DataDumpOptions } from './interfaces/Options';
 import { Table } from './interfaces/Table';
 import { typeCast } from './typeCast';
@@ -30,7 +30,50 @@ function buildInsert(
     return sql.replace(/NOFORMAT_WRAP\("##(.+?)##"\)/g, '$1');
 }
 function buildInsertValue(row: QueryRes, table: Table): string {
-    return `(${table.columnsOrdered.map(c => row[c]).join(',')})`;
+    return `(${modifyRowData(row, table).join(',')})`;
+}
+
+function modifyRowData(row: QueryRes, table: Table): unknown[] {
+    return table.columnsOrdered.map(c => {
+        if (null === row[c]) return null;
+
+        if (!table.modifyColumns.hasOwnProperty(c)) {
+            return row[c];
+        }
+
+        if (table.modifyColumns[c].match.length) {
+            let failures = 0;
+            for (let match of table.modifyColumns[c].match) {
+                for (let operator of match.operators) {
+                    let match =
+                        (null === (row[operator.column] as string).match(new RegExp(operator.pattern)));
+
+                    if (match !== operator.behaviour) {
+                        failures++;
+                        break;
+                    }
+                }
+            }
+
+            if (failures === table.modifyColumns[c].match.length) {
+                return row[c];
+            }
+        }
+
+        return (table.modifyColumns[c].value as string)
+            .replace(':table:', table.name)
+            .replace(':column:', c)
+            .replace(':random-word:', (_match) => randomWord() as string)
+            .replace(
+                /:random-number(\d{1,2})?:/,
+                (_match, len) => (Math.random()*(Math.pow(10, len as number))).toString()
+            )
+            .replace(
+                /\:column-([a-zA-Z_\-]+):/,
+                (_match, col) =>
+                    ['string', 'number'].includes(typeof row[col]) ? (row[col] as string) : ''
+            )
+    });
 }
 
 function executeSql(connection: mysql.Connection, sql: string): Promise<void> {

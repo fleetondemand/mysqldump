@@ -14,6 +14,27 @@ interface ColumnList {
     };
 }
 
+interface ModifyColumnList {
+    /**
+     * Key is the name of the column
+     */
+    [k: string]: {
+        /**
+         * Value to set column to.
+         */
+        value: string
+        match: ModifyColumnMatch[]
+    };
+}
+
+interface ModifyColumnMatch {
+    operators: Array<{
+        column: string,
+        pattern: string,
+        behaviour: boolean
+    }>
+}
+
 interface Table {
     /**
      * The name of the table.
@@ -33,6 +54,8 @@ interface Table {
      * The list of column definitions for the table.
      */
     columns: ColumnList;
+
+    modifyColumns: ModifyColumnList;
     /**
      * An ordered list of columns (for consistently outputing as per the DB definition)
      */
