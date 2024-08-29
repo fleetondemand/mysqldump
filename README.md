@@ -1,8 +1,8 @@
 # Mysql Dump
 
-[![npm version](https://badge.fury.io/js/mysqldump.svg)](https://npmjs.com/package/mysqldump) [![Build Status](https://travis-ci.org/bradzacher/mysqldump.svg)](https://travis-ci.org/bradzacher/mysqldump)
-
 [This codebase is no longer actively maintained. The package will continue working, but support and changes are no longer provided.](https://github.com/bradzacher/mysqldump/issues/134)
+
+This is a fork of the unmaintained mysqldump nodejs package, to allow fod to implement anonymisation into the dumping process
 
 Create a backup of a MySQL database.
 
