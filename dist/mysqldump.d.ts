@@ -228,6 +228,20 @@ export interface DumpOptions {
 	 */
 	trigger?: false | TriggerDumpOptions;
 }
+export interface ModifyDataOptions {
+    [table: string]: {
+        [column: string]: {
+            match?: Array<{
+                operators: Array<{
+                    column: string,
+                    pattern: string,
+                    behaviour?: boolean
+                }>
+            }>
+            value: string
+        }
+    }
+}
 export interface Options {
 	/**
 	 * Database connection options
@@ -247,6 +261,10 @@ export interface Options {
 	 * Defaults to false.
 	 */
 	compressFile?: boolean;
+    /**
+     * Table-Column mapping of how data should be modified
+     */
+    modifyDataOptions?: ModifyDataOptions;
 }
 export interface ColumnList {
 	/**
@@ -262,6 +280,25 @@ export interface ColumnList {
 		 */
 		nullable: boolean;
 	};
+}
+export interface ModifyColumnList {
+    /**
+     * Key is the name of the column
+     */
+    [k: string]: {
+        /**
+         * Value to set column to.
+         */
+        value: string
+        match: ModifyColumnMatch[]
+    };
+}
+export interface ModifyColumnMatch {
+    operators: Array<{
+        column: string,
+        pattern: string,
+        behaviour: boolean
+    }>
 }
 export interface Table {
 	/**
@@ -282,6 +319,10 @@ export interface Table {
 	 * The list of column definitions for the table.
 	 */
 	columns: ColumnList;
+    /**
+     * List of columns to be modified.
+     */
+    modifyColumns: ModifyColumnList;
 	/**
 	 * An ordered list of columns (for consistently outputing as per the DB definition)
 	 */
